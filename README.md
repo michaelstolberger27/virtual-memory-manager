@@ -1,41 +1,56 @@
 # Virtual Memory Manager Simulator
 
-A C++ simulation of a virtual memory system using paging and FIFO page replacement. This project demonstrates how an operating system handles page faults, manages physical memory, and applies page replacement policies when memory is full.
+A C++ simulation of a virtual memory system demonstrating paging and multiple page replacement algorithms. This project illustrates how an operating system handles page faults, manages physical memory, and applies page replacement policies such as **FIFO**, **LRU**, and **Optimal** when memory is full.
+
+---
 
 ## Overview
 
-This project simulates:
+This simulator models:
 
-- Virtual to physical memory translation using a single-level page table.
-- Page faults and page replacement using the **FIFO (First-In, First-Out)** algorithm.
-- Configurable number of virtual pages, physical frames, and page access patterns.
+- Virtual-to-physical memory translation using a single-level page table abstraction.
+- Handling of page faults and page replacement with configurable algorithms:
+  - **FIFO (First-In, First-Out)**
+  - **LRU (Least Recently Used)**
+  - **Optimal (theoretical best)**
+- Customizable virtual pages, physical frames, and page reference strings.
 
 ---
 
 ## Features
 
-- FIFO page replacement algorithm
-- Command-line input or file-based simulation
-- Tracks page hits, page faults, and page fault rate
-- Easy to extend with new algorithms (e.g., LRU, Optimal)
+- Multiple page replacement algorithms: FIFO, LRU, Optimal
+- Command-line interface to select algorithm and provide input
+- Tracks page hits, page faults, and computes page fault rate
+- Modular and extensible design for adding more algorithms
+- Simple input format supporting file redirection or interactive mode
 
 ---
 
 ## Project Structure
 
+```txt
 virtual-memory-manager/
 │
+├── include/
+│ ├── MemoryManager.h # Base class interface
+│ ├── FIFOManager.h # FIFO algorithm implementation
+│ ├── LRUManager.h # LRU algorithm implementation
+│ └── OptimalManager.h # Optimal algorithm implementation
+│
 ├── src/
-│ ├── main.cpp # Entry point and simulation logic
-│ ├── MemoryManager.cpp # FIFO page replacement implementation
-│ ├── MemoryManager.h # Class declarations
+│ ├── main.cpp # Program entry point and input handling
+│ ├── FIFOManager.cpp # FIFO algorithm logic
+│ ├── LRUManager.cpp # LRU algorithm logic
+│ └── OptimalManager.cpp # Optimal algorithm logic
 │
 ├── test/
-│ ├── test_input.txt # Sample input for testing
+│ └── test_input.txt # Sample input for testing
 │
-├── Makefile # Build instructions
+├── Makefile # Build script
 ├── README.md # Project documentation
 └── .gitignore
+```
 
 ---
 
@@ -43,9 +58,9 @@ virtual-memory-manager/
 
 ### Prerequisites
 
-- C++11 or newer
-- A POSIX-compatible terminal
-- `make` utility (optional)
+- C++ compiler with **C++14** support or higher
+- POSIX-compatible shell or terminal
+- `make` utility for building (optional)
 
 ### Building the Project
 
@@ -53,31 +68,35 @@ virtual-memory-manager/
 make
 ```
 
-This compiles the simulator and produces an executable named vmm_simulator.
+This compiles the source files and creates the executable `vmm_simulator`.
 
 ### Running the Simulator
 
-You can run it interactively:
+Specify the page replacement algorithm as the first argument:
 
 ```bash
-./vmm_simulator
+./vmm_simulator fifo < test/test_input.txt
+./vmm_simulator lru < test/test_input.txt
+./vmm_simulator optimal < test/test_input.txt
 ```
 
-Or use redirected input from a test file:
+You can also run interactively by entering input manually after running:
 
 ```bash
-./vmm_simulator < test/test_input.txt
+./vmm_simulator fifo
 ```
 
-### Sample Input Format
+---
 
-The simulator expects input in the following order:
+### Input Format
+
+Provide the following input separated by spaces or newlines:
 
 ```txt
-<number of virtual pages> <number of physical frames> <length of reference string> <space-separated page reference string>
+<number_of_virtual_pages> <number_of_physical_frames> <length_of_reference_string> <page_reference_string...>
 ```
 
-Example: 
+Example:
 
 ```txt
 10 3 12 7 0 1 2 0 3 0 4 2 3 0 3
@@ -85,7 +104,7 @@ Example:
 
 ---
 
-### Example Output
+### Sample Output
 
 ```txt
 Accessing page 7 - Page Fault!
@@ -100,28 +119,18 @@ Total page faults: 10
 Page fault rate: 83.3333%
 ```
 
----
+--- 
 
-### Concepts Demonstrated
+## Concepts Demonstrated
 
-- Virtual memory and page tables  
-- Page faults and replacement strategies  
-- FIFO algorithm and queue-based eviction  
-- Memory performance metrics (hit/miss ratio)
-
----
-
-### Future Enhancements
-
-- ✅ Implement **LRU** and **Optimal** replacement algorithms  
-- ✅ Simulate **TLB (Translation Lookaside Buffer)**  
-- ✅ Add **multi-level page tables**  
-- ✅ Track **dirty/reference bits**  
-- ✅ Support **multiple processes** with isolated memory spaces  
-- ✅ Visual output or GUI to show memory state dynamically
+- Virtual memory management and paging basics  
+- Page fault detection and handling  
+- FIFO, LRU, and Optimal page replacement algorithms  
+- Data structures: queues, lists, hash maps  
+- Performance metrics: hit/miss ratio, fault rate  
 
 ---
 
-### Author
+## Author
 
-Michael Stolberger  
+Michael Stolberger
