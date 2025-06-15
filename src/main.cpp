@@ -1,45 +1,68 @@
 #include <iostream>
-#include <fstream>
 #include <vector>
+#include <string>
+#include <memory>
+#include <stdexcept>
+
 #include "MemoryManager.h"
+#include "FIFOManager.h"
+#include "LRUManager.h"
+#include "OptimalManager.h"
 
-int main()
+std::unique_ptr<MemoryManager> createManager(const std::string &algo)
 {
-    int numPages, numFrames;
+    if (algo == "fifo")
+        return std::make_unique<FIFOManager>();
+    if (algo == "lru")
+        return std::make_unique<LRUManager>();
+    if (algo == "optimal")
+        return std::make_unique<OptimalManager>();
+    throw std::runtime_error("Unknown algorithm: " + algo);
+}
 
-    std::cout << "Enter number of virtual pages: ";
-    std::cin >> numPages;
+int main(int argc, char *argv[])
+{
+    if (argc < 2)
+    {
+        std::cerr << "Usage: ./vmm_simulator <algorithm> < input.txt\n";
+        std::cerr << "Available algorithms: fifo, lru, optimal" << std::endl;
+        return 1;
+    }
 
-    std::cout << "Enter number of physical frames: ";
-    std::cin >> numFrames;
+    std::string algo = argv[1];
+    std::unique_ptr<MemoryManager> manager;
 
-    MemoryManager memManager(numPages, numFrames);
+    try
+    {
+        manager = createManager(algo);
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << std::endl;
+        return 1;
+    }
 
-    std::cout << "Enter reference string length: ";
-    int length;
-    std::cin >> length;
+    int numPages, numFrames, refLength;
+    std::cin >> numPages >> numFrames >> refLength;
 
-    std::vector<int> referenceString(length);
+    if (!std::cin)
+    {
+        std::cerr << "Invalid input format." << std::endl;
+        return 1;
+    }
 
-    std::cout << "Enter reference string (space-separated page numbers): ";
-    for (int i = 0; i < length; i++)
+    std::vector<int> referenceString(refLength);
+    for (int i = 0; i < refLength; ++i)
     {
         std::cin >> referenceString[i];
-        if (referenceString[i] < 0 || referenceString[i] >= numPages)
+        if (!std::cin)
         {
-            std::cerr << "Invalid page number: " << referenceString[i] << std::endl;
+            std::cerr << "Invalid reference string input." << std::endl;
             return 1;
         }
     }
 
-    // Simulate accesses
-    for (int page : referenceString)
-    {
-        bool fault = memManager.accessPage(page);
-        std::cout << "Accessing page " << page << (fault ? " - Page Fault!" : " - Hit") << std::endl;
-    }
-
-    memManager.printStats();
+    manager->simulate(referenceString, numFrames);
 
     return 0;
 }
